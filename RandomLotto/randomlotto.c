@@ -11,6 +11,7 @@ int swap(int* x, int* y)
 }
 int main()
 {
+	FILE * pFile;
 	int numbers[49];
 	int i;
 	int j;
@@ -18,6 +19,7 @@ int main()
 	int winners[6];
 	int rnd = 0;
 	char matrix[10][5];
+	pFile = fopen("lotto.txt", "w");
 	srand(time(0));
 	for(i = 0; i < 49; i++)
 	{
@@ -39,19 +41,20 @@ int main()
 		swap(numbers+(length-1), numbers+rnd);
 		length--;
 		printf("%d ", winners[i]);
-		matrix[(winners[i]-1)%10][winners[i]/10] = '+';
+		matrix[(winners[i]-1)%10][(winners[i]-1)/10] = '+';
 	}
 	putchar('\n');
-	printf("  1 2 3 4 5 6 7 8 9 10\n");
+	fprintf(pFile, "  1 2 3 4 5 6 7 8 9 10\n");
 	for(i = 0; i < 5; i++)
 	{
-		printf("%d ", i);
+		fprintf(pFile,"%d ", i);
 		for(j = 0; j < 10; j++)
 		{
-			putchar(matrix[j][i]);
-			putchar(' ');
+			fputc(matrix[j][i], pFile);
+			fputc(' ', pFile);
 		}
-		putchar('\n');
+		fputc('\n', pFile);
 	}
+	fclose(pFile);
 	return 0;
 }
