@@ -127,7 +127,7 @@ int location(char* s1, char* s2)
 int main()
 {
 	char output[100];
-	int	intInput = 0;
+	int intInput = 0;
 	char stringInput[100];
 	char stringInput2[100];
 	char inputBase = 'x';
@@ -175,11 +175,6 @@ int main()
 		inputBase = 'x';
 		printf("\n");
 	}
-	/*printf("%s\n", int2Bin(31, output));*/
-	/*printf("%s\n", int2Bin(31, output2));*/
-	/*printf("%d\n", bin2Int("10101"));*/
-	/*printf("%d\n", bin2Int(output2));*/
-	/*printf("%d\n", bin2Int("93ak1"));*/
 	printf("Enter a string: ");
 	scanf("%s", stringInput);
 	printf("Enter chars filter: ");
