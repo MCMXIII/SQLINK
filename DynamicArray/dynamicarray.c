@@ -65,7 +65,10 @@ dArray arrprint(dArray arr)
 }
 dArray destroy(dArray arr)
 {
-	free(arr->arr);
+	if(arr != NULL)
+	{
+		free(arr->arr);
+	}
 	free(arr);
 	return arr;
 }
