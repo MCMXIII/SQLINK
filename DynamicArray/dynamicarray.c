@@ -19,7 +19,13 @@ dArray create(int capacity)
 }
 dArray insert(dArray array, int val)
 {
-	dArray temp = array;
+	int* temp;
+	if(array == NULL)
+	{
+		printf("Error! Cannot insert %d.\n", val);
+		return array;
+	}
+	temp = array->arr;
 	if(array->index < array->capacity)
 	{
 		array->arr[(array->index)++] = val;
@@ -27,15 +33,15 @@ dArray insert(dArray array, int val)
 		return array;
 	}
 	array->arr = (int*)realloc(array->arr, (2*(array->capacity))*sizeof(int));
-	if(array == NULL)
+	if(array->arr == NULL)
 	{
 		printf("Error! Cannot insert %d.\n", val);
 		return array;
 	}
-	if(array != temp)
+	if(array->arr != temp)
 	{
-		free(array);
-		array = temp;
+		free(array->arr);
+		array->arr = temp;
 	}
 	array->arr[(array->index)++] = val;
 	(array->capacity)*=2;
