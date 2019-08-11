@@ -3,6 +3,11 @@
 
 int* insert(int* arr, int val, int* capacity, int* index)
 {
+	if(arr == NULL || capacity == NULL || (*capacity) < 1 || index == NULL || (*index) < 0)
+	{
+		printf("Wrong values or pointers!\n");
+		return arr;
+	}
 	if(*index < *capacity)
 	{
 		arr[*index] = val;
