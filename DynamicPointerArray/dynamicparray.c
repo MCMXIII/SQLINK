@@ -44,11 +44,13 @@ dArray insert(dArray array, int* valp)
 		printf("Error! Cannot insert pointer to %d.\n", *valp);
 		return array;
 	}
-	if(array->arr != temp)
+	/*if(array->arr != temp)
 	{
-		free(array->arr);
-		array->arr = temp;
-	}
+		if(temp != NULL)
+		{
+			free(temp);
+		}
+	}*/
 	array->arr[(array->index)++] = valp;
 	(array->capacity)*=2;
 	printf("arr[%d] = pointer to %d, capacity = %d\n", (array->index - 1), *(array->arr[(array->index) - 1]), array->capacity);
