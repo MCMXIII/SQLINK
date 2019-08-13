@@ -34,7 +34,7 @@ meeting createMeeting(float bhour, float ehour, int room)
 	if (m == NULL || bhour >= ehour || bhour < 0 || ehour > 24)
 	{
 		printf("Error! Cannot create a meeting.\n");
-		return m;
+		return NULL;
 	}
 	m->bhour = bhour;
 	m->ehour = ehour;
