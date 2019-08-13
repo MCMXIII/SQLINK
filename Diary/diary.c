@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include "diary.h"
 
 struct meeting{
@@ -18,20 +21,27 @@ diary createDiary()
 		printf("Error! Cannot create a diary.\n");
 		return d;
 	}
-	d->capacity = 1;
+	d->capacity = 16;
 	d->amount = 0;
-	d->arr = (meeting*)malloc(sizeof(meeting));
+	d->arr = (meeting*)malloc(16*sizeof(meeting));
 	if (d->arr == NULL)
 	{
 		printf("Error! Cannot create a meeting array.\n");
-		return d;
+		free(d);
+		return NULL;
 	}
 	return d;
 }
 meeting createMeeting(float bhour, float ehour, int room)
 {
-	meeting m = (meeting)malloc(sizeof(struct meeting));
-	if (m == NULL || bhour >= ehour || bhour < 0 || ehour > 24)
+	meeting m;
+	m = (meeting)malloc(sizeof(struct meeting));
+	if (bhour >= ehour || bhour < 0 || ehour > 24)
+	{
+		printf("Error! Cannot create a meeting.\n");
+		return NULL;
+	}
+	if (m == NULL)
 	{
 		printf("Error! Cannot create a meeting.\n");
 		return NULL;
@@ -71,9 +81,10 @@ diary insert(diary d, meeting m)
 			}
 			d->arr[i] = m;
 			d->amount++;
-			printf("Meeting added successfully between %d and %d minutes and %d and %d minutes in room %d.\n", (int)(d->arr[i]->bhour), (60*(int)(100*(d->arr[i]->bhour)-100*(int)(d->arr[i]->bhour))/100), (int)(d->arr[i]->ehour), (60*(int)(100*(d->arr[i]->ehour)-100*(int)(d->arr[i]->ehour))/100), d->arr[i]->room);
+			/*printf("Meeting added successfully between %d and %d minutes and %d and %d minutes in room %d.\n", (int)(d->arr[i]->bhour), (60*(int)(100*(d->arr[i]->bhour)-100*(int)(d->arr[i]->bhour))/100), (int)(d->arr[i]->ehour), (60*(int)(100*(d->arr[i]->ehour)-100*(int)(d->arr[i]->ehour))/100), d->arr[i]->room);*/
 			return d;
 		}
+		free(m);
 		printf("Error! Cannot insert meeting to diary. One or more meetings are parallel to the inserted meeting.\n");
 		return d;
 	}
@@ -104,9 +115,10 @@ diary insert(diary d, meeting m)
 		}
 		d->arr[i] = m;
 		d->amount++;
-		printf("Meeting added successfully between %d and %d minutes and %d and %d minutes in room %d.\n", (int)(d->arr[i]->bhour), (60*(int)(100*(d->arr[i]->bhour)-100*(int)(d->arr[i]->bhour))/100), (int)(d->arr[i]->ehour), (60*(int)(100*(d->arr[i]->ehour)-100*(int)(d->arr[i]->ehour))/100), d->arr[i]->room);
+		/*printf("Meeting added successfully between %d and %d minutes and %d and %d minutes in room %d.\n", (int)(d->arr[i]->bhour), (60*(int)(100*(d->arr[i]->bhour)-100*(int)(d->arr[i]->bhour))/100), (int)(d->arr[i]->ehour), (60*(int)(100*(d->arr[i]->ehour)-100*(int)(d->arr[i]->ehour))/100), d->arr[i]->room);*/
 		return d;
 	}
+	free(m);
 	printf("Error! Cannot insert meeting to diary. One or more meetings are parallel to the inserted meeting.\n");
 	return d;
 }
@@ -170,6 +182,14 @@ diary mremove(diary d, float beginHour)
 	}
 	return d;
 }
+int ceiling(float f)
+{
+	if(f - (int)f == 0)
+	{
+		return (int)f;
+	}
+	return (int)f + 1;
+}
 int mprint(int i, diary d)
 {
 	int bmin, emin;
@@ -188,7 +208,7 @@ int mprint(int i, diary d)
 			putchar('0');
 		}
 		printf("%d:",(int)d->arr[i]->bhour);
-		bmin = (60*(int)(100*(d->arr[i]->bhour)-100*(int)(d->arr[i]->bhour))/100);
+		bmin = (60*(int)(ceiling(100*(d->arr[i]->bhour))-100*(int)(d->arr[i]->bhour))/100);
 		if(bmin < 10)
 		{
 			putchar('0');
@@ -199,7 +219,7 @@ int mprint(int i, diary d)
 			putchar('0');
 		}
 		printf("%d:",(int)d->arr[i]->ehour);
-		emin = (60*(int)(100*(d->arr[i]->ehour)-100*(int)(d->arr[i]->ehour))/100);
+		emin = (60*(int)(ceiling(100*(d->arr[i]->ehour))-100*(int)(d->arr[i]->ehour))/100);
 		if(emin < 10)
 		{
 			putchar('0');
@@ -249,4 +269,70 @@ diary destroy(diary d)
 		free(d);
 	}
 	return d;
+}
+diary loadFromFile()
+{
+	diary d;
+	meeting m;
+	FILE* f;
+	float bh, eh;
+	int r;
+	d = createDiary();
+	f = fopen("diary.dia", "r");
+	if(d == NULL || f == NULL)
+	{
+		printf("Error! Cannot read from diary file.\n");
+		if(d == NULL)
+		{
+			return NULL;
+		}
+		else
+		{
+			return d;
+		}
+	}
+	while(fscanf(f, "%f %f %d\n", &bh, &eh, &r) != EOF)
+	{
+		m = createMeeting(bh, eh, r);
+		if(m == NULL)
+		{
+			printf("Error! Cannot generate a meeting from file.\n");
+		}
+		else
+		{
+			insert(d, m);
+		}
+	}
+	fclose(f);
+	return d;
+}
+int saveToFile(diary d)
+{
+	int i;
+	FILE* f;
+	if(d == NULL || d->arr == NULL)
+	{
+		printf("Error! cannot save diary file.\n");
+		return -1;
+	}
+	f = fopen("diary.dia", "w");
+	for(i = 0; i < d->amount; i++)
+	{
+		if(d->arr[i] == NULL)
+		{
+			printf("Error! cannot save row in diary file.\n");
+		}
+		else
+		{
+			fprintf(f, "%f %f %d\n", d->arr[i]->bhour, d->arr[i]->ehour, d->arr[i]->room);
+		}
+	}
+	fclose(f);
+	return 0;
+}
+int saveAndClose(diary d)
+{
+	saveToFile(d);
+	destroy(d);
+	return 0;
 }

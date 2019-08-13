@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <math.h>
 
 #ifndef DIARY_H
 #define DIARY_H
@@ -16,5 +15,8 @@
 	int mprint2(meeting m, diary d);
 	diary dprint(diary d);
 	diary destroy(diary d);
+	diary loadFromFile();
+	int saveToFile(diary d);
+	int saveAndClose(diary d);
 
 #endif
