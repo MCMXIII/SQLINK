@@ -127,6 +127,10 @@ int findIndex(diary d, float beginHour)
 	int i = ((d->amount)/2)-1;
 	int l = 0;
 	int r = d->amount - 1;
+	if(d->amount == 1)
+	{
+		i++;
+	}
 	if(d == NULL || d->arr == NULL || beginHour > 24 || beginHour < 0)
 	{
 		printf("Error! Cannot find meeting in diary.\n");
