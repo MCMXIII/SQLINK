@@ -74,7 +74,6 @@ AdtStatus   darrayAdd(darray *dArr,  void  *_item)
 		dArr->m_capacity*=2;
 	}
 	dArr->m_arr[dArr->m_amount++] = _item;
-	_item = 0;
 	return OK;
 }
 /* Delete number from the end. */
@@ -149,7 +148,7 @@ AdtStatus darraySort(darray *dArr, elementCompare cmp)
 	void* temp;
 	if(dArr == NULL || dArr->m_arr == NULL)
 	{
-		return AllocationError;
+		return UndeclaredError;
 	}
 	if(dArr->m_capacity <= 0)
 	{
@@ -182,7 +181,7 @@ AdtStatus darrayQuickSort(darray *dArr, elementCompare cmp, int first, int last)
 	void* temp;
 	if(dArr == NULL || dArr->m_arr == NULL)
 	{
-		return AllocationError;
+		return UndeclaredError;
 	}
 	if(dArr->m_capacity <= 0)
 	{
