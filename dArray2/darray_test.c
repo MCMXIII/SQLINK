@@ -101,18 +101,26 @@ int main()
 			{
 				printf("Enter an index to set!\n");
 				scanf("%d", &userInput);
-				if(allocFP(&fp) == -1)
+				darrayItemsNum(dArr, funcOutput);
+				if(userInput >= 0 && userInput < *funcOutput)
 				{
-					command = 'q';
-					darrayDestroy(dArr, &destroy, (void*)funcOutput);
-					break;
+					if(allocFP(&fp) == -1)
+					{
+						command = 'q';
+						darrayDestroy(dArr, &destroy, (void*)funcOutput);
+						break;
+					}
+					printf("Enter a name to set!\n");
+					scanf("%s", fp->name);
+					printf("Enter a number to set!\n");
+					scanf("%d", &fp->number);
+					darraySet(dArr, userInput, (void*)fp, (void**)&replaced);
+					printf("%d: %s\n", replaced->number, replaced->name);
 				}
-				printf("Enter a name to set!\n");
-				scanf("%s", fp->name);
-				printf("Enter a number to set!\n");
-				scanf("%d", &fp->number);
-				darraySet(dArr, userInput, (void*)fp, (void**)&replaced);
-				printf("%d: %s\n", replaced->number, replaced->name);
+				else
+				{
+					printf("Invalid index!\n");
+				}
 				command = 'x';
 				break;
 			}
@@ -120,8 +128,16 @@ int main()
 			{
 				printf("Enter an index to get!\n");
 				scanf("%d", &userInput);
-				darrayGet(dArr, userInput, (void**)(&fp));
-				printf("%d: %s\n", fp->number, fp->name);
+				darrayItemsNum(dArr, funcOutput);
+				if(userInput >= 0 && userInput < *funcOutput)
+				{
+					darrayGet(dArr, userInput, (void**)(&fp));
+					printf("%d: %s\n", fp->number, fp->name);
+				}
+				else
+				{
+					printf("Invalid index!\n");
+				}
 				command = 'x';
 				break;
 			}
