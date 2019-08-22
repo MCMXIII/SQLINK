@@ -174,6 +174,12 @@ AdtStatus darraySort(darray *dArr, elementCompare cmp)
 	}
 	return OK;
 }
+void swap(void** arr, int i, int j)
+{
+	void* temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp;
+}
 AdtStatus darrayQuickSort(darray *dArr, elementCompare cmp, int first, int last)
 {
 	int counter = 0;
@@ -199,9 +205,7 @@ AdtStatus darrayQuickSort(darray *dArr, elementCompare cmp, int first, int last)
 	{
 		if(cmp(dArr->m_arr[i], dArr->m_arr[first]) < 0)
 		{
-			temp = dArr->m_arr[i];
-			dArr->m_arr[i] = dArr->m_arr[first];
-			dArr->m_arr[first] = temp;
+			swap(dArr->m_arr, i, first);
 		}
 	}
 	else
@@ -220,14 +224,10 @@ AdtStatus darrayQuickSort(darray *dArr, elementCompare cmp, int first, int last)
 			}
 			if(i < j)
 			{
-				temp = dArr->m_arr[i];
-				dArr->m_arr[i] = dArr->m_arr[j];
-				dArr->m_arr[j] = temp;
+				swap(dArr->m_arr, i, j);
 			}
 		}
-		temp = dArr->m_arr[first];
-		dArr->m_arr[first] = dArr->m_arr[counter];
-		dArr->m_arr[counter] = temp;
+		swap(dArr->m_arr, first, counter);
 		darrayQuickSort(dArr, cmp, first, counter - 1);
 		darrayQuickSort(dArr, cmp, counter + 1, last);
 	}
