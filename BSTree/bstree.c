@@ -110,7 +110,6 @@ vertex* findClosestDescendant(vertex* v)
 	{
 		v=v->left;
 	}
-	if(v->right == NULL)
 	return v;
 }
 int replaceWithSon(vertex* v, char whichSon)
