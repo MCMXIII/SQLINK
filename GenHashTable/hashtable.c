@@ -16,6 +16,10 @@ struct hashTable {
 	elementCompare compare;
 };
 
+/**************************************
+**********Assistant functions**********
+**************************************/
+
 node* returnNode(hashTable* t, void* key)
 {
 	node* listScanner;
@@ -50,16 +54,24 @@ node* returnPrevious(hashTable* t, node* n)
 	}
 	return NULL;	
 }
+
+/**************************************
+**********Hash Table functions*********
+**************************************/
+
 hashTable* hashTableCreate(unsigned long size, elementHash hash, elementCompare compare)
 {
 	unsigned long i = 0;
 	hashTable* t;
+	if(size == 0 || hash == NULL || compare == NULL)
+	{
+		return NULL;
+	}
 	t = (hashTable*)malloc(sizeof(hashTable));
 	if(t == NULL)
 	{
 		return NULL;
 	}
-	/*printf("Table created!\n");*/
 	t->size = size;
 	t->hash = hash;
 	t->compare = compare;
@@ -80,7 +92,7 @@ AdtStatus hashTableDestroy(hashTable* t, elementDestroy destroyKey, elementDestr
 	unsigned long i = 0;
 	node* listCurrent = NULL;
 	node* listNext = NULL;
-	if(t == NULL)
+	if(t == NULL || destroyKey == NULL || destroyValue == NULL)
 	{
 		return UndeclaredError;
 	}
@@ -114,10 +126,10 @@ AdtStatus hashTableDestroy(hashTable* t, elementDestroy destroyKey, elementDestr
 	free(t);
 	return OK;
 }
-AdtStatus hashTableInsert(hashTable* t, void* key, void* value, char overwriteValue)
+AdtStatus hashTableInsert(hashTable* t, void* key, void* value, char overwriteValue, elementDestroy destroyValue)
 {
 	node* keyNode;
-	if(t == NULL || t->array == NULL)
+	if(t == NULL || t->array == NULL || key == NULL || value == NULL || (overwriteValue == 'y' && destroyValue == NULL))
 	{
 		return UndeclaredError;
 	}
@@ -138,6 +150,7 @@ AdtStatus hashTableInsert(hashTable* t, void* key, void* value, char overwriteVa
 	{
 		if(overwriteValue == 'y')
 		{
+			destroyValue((void*)keyNode->value);
 			keyNode->value = value;
 		}
 		else
@@ -147,22 +160,41 @@ AdtStatus hashTableInsert(hashTable* t, void* key, void* value, char overwriteVa
 	}
 	return OK;
 }
-AdtStatus hashTableDelete(hashTable* t, void* key, elementDestroy destroyKey, elementDestroy destroyValue)
+AdtStatus hashTableUpdate(hashTable* t, void* key, void* value, elementDestroy destroyValue)
 {
 	node* keyNode;
-	node* keyPrevious;
-	if(t == NULL || t->array == NULL)
+	if(t == NULL || t->array == NULL || key == NULL || value == NULL || destroyValue == NULL)
 	{
 		return UndeclaredError;
 	}
 	keyNode = returnNode(t, key);
-	keyPrevious = returnPrevious(t, key);
 	if(keyNode == NULL)
 	{
 		return NotFoundError;
 	}
 	else
 	{
+		destroyValue((void*)keyNode->value);
+		keyNode->value = value;
+	}
+	return OK;
+}
+AdtStatus hashTableDelete(hashTable* t, void* key, elementDestroy destroyKey, elementDestroy destroyValue)
+{
+	node* keyNode;
+	node* keyPrevious;
+	if(t == NULL || t->array == NULL || key == NULL || destroyKey == NULL || destroyValue == NULL)
+	{
+		return UndeclaredError;
+	}
+	keyNode = returnNode(t, key);
+	if(keyNode == NULL)
+	{
+		return NotFoundError;
+	}
+	else
+	{
+		keyPrevious = returnPrevious(t, keyNode);
 		if(keyPrevious == NULL)
 		{
 			t->array[(t->hash)(key)%(t->size)] = keyNode->next;
@@ -170,23 +202,23 @@ AdtStatus hashTableDelete(hashTable* t, void* key, elementDestroy destroyKey, el
 		else
 		{
 			keyPrevious->next = keyNode->next;
-			if(keyNode->key != NULL)
-			{
-				destroyKey((void*)(keyNode->key));
-			}
-			if(keyNode->value != NULL)
-			{
-				destroyValue((void*)(keyNode->value));
-			}
-			free(keyNode);
 		}
+		if(keyNode->key != NULL)
+		{
+			destroyKey((void*)(keyNode->key));
+		}
+		if(keyNode->value != NULL)
+		{
+			destroyValue((void*)(keyNode->value));
+		}
+		free(keyNode);
 	}
 	return OK;
 }
 void* hashTableFind(hashTable* t, void* key)
 {
 	node* n;
-	if(t == NULL || t->array == NULL)
+	if(t == NULL || t->array == NULL || key == NULL)
 	{
 		return NULL;
 	}
@@ -201,7 +233,7 @@ int hashTableForEach(hashTable* t, elementAction action)
 {
 	int i = 0;
 	node* listCurrent = NULL;
-	if(t == NULL || t->array == NULL)
+	if(t == NULL || t->array == NULL || action == NULL)
 	{
 		return -1;
 	}
@@ -212,7 +244,7 @@ int hashTableForEach(hashTable* t, elementAction action)
 			listCurrent = t->array[i];
 			while(listCurrent != NULL)
 			{
-				action((void*)(listCurrent->value));
+				action(i, (void*)listCurrent->key, (void*)listCurrent->value);
 				listCurrent = listCurrent->next;
 			}
 		}
