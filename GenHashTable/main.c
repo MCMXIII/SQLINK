@@ -330,7 +330,6 @@ int main()
 	int i = 0;
 	int arrayLength = 50;
 	int j = 0;
-	int removals = 0;
 	unsigned char* key;
 	unsigned char** keys;
 	unsigned char* value;
