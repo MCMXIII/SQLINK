@@ -32,7 +32,7 @@ int main()
 			printf("Father to %d: %s", getpid(), input);
 			break;
 		}
-		write(parr[1], "Hello Father...\n", 160);
+		write(parr[1], "Hello father...\n", 160);
 	}
 	return 0;
 }
