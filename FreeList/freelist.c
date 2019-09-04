@@ -39,20 +39,20 @@ void* memInit(void* buffer, unsigned int size)
 	{
 		size--;
 	}
-	*((unsigned int*)buffer) = size - 4;
-	return buffer;
+	*((unsigned int*)buffer) = size - 8;
+	*((unsigned int*)buffer + 1) = size - 8;
+	return (void*)((unsigned int*)buffer + 1);
 }
-void* memAlloc(void* buffer, unsigned int size, unsigned int bufferSize)
+void* memAlloc(void* buffer, unsigned int size)
 {
 	void* ptr = buffer;
 	void* ptr2;
 	size <<= 2;
-	bufferSize <<= 2;
 	if(buffer == 0 || size < 4 || size & LEFT_BIT != 0)
 	{
 		return 0;
 	}
-	while((char *)(ptr) - (char*)(buffer) < bufferSize)
+	while((char *)(ptr) - (char*)(buffer) < *((unsigned int*)buffer - 1))
 	{
 		if((*((unsigned int*)ptr)&LEFT_BIT)<=0)
 		{
@@ -61,12 +61,12 @@ void* memAlloc(void* buffer, unsigned int size, unsigned int bufferSize)
 				splitSpace(&ptr, &ptr2, size);
 				return ptr;
 			}
-			if(((char *)(ptr) - (char*)(buffer))+*((unsigned int*)ptr) + 4 >= bufferSize)
+			if(((char *)(ptr) - (char*)(buffer))+*((unsigned int*)ptr) + 4 >= *((unsigned int*)buffer - 1))
 			{
 				return 0;
 			}
 			ptr2 = (void*)((char*)ptr + *((unsigned int*)ptr) + 4);
-			while((char *)(ptr2) - (char*)(buffer) < bufferSize && (*((unsigned int*)ptr2)&LEFT_BIT)<=0)
+			while((char *)(ptr2) - (char*)(buffer) < *((unsigned int*)buffer - 1) && (*((unsigned int*)ptr2)&LEFT_BIT)<=0)
 			{
 				*((unsigned int*)ptr) += *((unsigned int*)ptr2) + 4;
 				if(*((unsigned int*)ptr) >= size)
@@ -80,21 +80,24 @@ void* memAlloc(void* buffer, unsigned int size, unsigned int bufferSize)
 		}
 		else
 		{
+			if(((char *)(ptr) - (char*)(buffer))+(*((unsigned int*)ptr) -LEFT_BIT) + 4 >= *((unsigned int*)buffer - 1))
+			{
+				return 0;
+			}
 			ptr=(void*)((char*)ptr+((*((unsigned int*)ptr)-LEFT_BIT) + 4));
 		}
 	}
 	return 0;
 }
-int memFree(void** memory, void* buffer, unsigned int bufferSize)
+int memFree(void** memory, void* buffer)
 {
 	void* ptr = *memory;
-	bufferSize<<=2;
-	if(*memory == 0 || (*((unsigned int*)ptr)&LEFT_BIT)==0)
+	if(*memory == 0 || (*((unsigned int*)ptr)&LEFT_BIT)<=0)
 	{
 		return -1;
 	}
 	ptr=(void*)((char*)ptr+((*((unsigned int*)ptr) -LEFT_BIT + 4)));
-	while((char *)(ptr) - (char*)(buffer) < bufferSize && (*((unsigned int*)ptr)&LEFT_BIT)<=0)
+	while((char *)(ptr) - (char*)(buffer) < *((unsigned int*)buffer - 1) && (*((unsigned int*)ptr)&LEFT_BIT)<=0)
 	{	
 		**((unsigned int**)memory) += *((unsigned int*)ptr) + 4;
 		ptr=(void*)((char*)ptr+((*((unsigned int*)ptr) + 4)));
