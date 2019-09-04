@@ -47,5 +47,6 @@ int main()
 	memFree(&space4, buffer, 50);
 	memFree(&space3, buffer, 50);
 	memFree(&space1, buffer, 50);
+	free(buffer);
 	return 0;
 }

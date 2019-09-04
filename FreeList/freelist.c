@@ -5,6 +5,16 @@
 #define ALLOC_BIT(x) (x + LEFT_BIT)
 #define FREE_BIT(x) (x - LEFT_BIT)
 
+void splitSpace(void** ptr, void** ptr2, unsigned int size)
+{
+	if(**((unsigned int**)ptr) > size)
+	{
+		*ptr2 = (void*)((unsigned char*)(*ptr) + size + 4);
+		**((unsigned int**)ptr2) = (**((unsigned int**)ptr) - size - 4);
+		**((unsigned int**)ptr) = size;
+	}
+	**((unsigned int**)ptr) = ALLOC_BIT(**((unsigned int**)ptr));
+}
 void* memInit(void* buffer, unsigned int size)
 {
 	unsigned int* ptr = (unsigned int*)buffer;
@@ -36,16 +46,11 @@ void* memAlloc(void* buffer, unsigned int size, unsigned int bufferSize)
 {
 	void* ptr = buffer;
 	void* ptr2;
-	unsigned int value;
 	size <<= 2;
 	bufferSize <<= 2;
 	if(buffer == 0 || size < 4 || size & LEFT_BIT != 0)
 	{
 		return 0;
-	}
-	while(size & 3 != 0)
-	{
-		size++;
 	}
 	while((char *)(ptr) - (char*)(buffer) < bufferSize)
 	{
@@ -53,13 +58,7 @@ void* memAlloc(void* buffer, unsigned int size, unsigned int bufferSize)
 		{
 			if(*((unsigned int*)ptr) >= size)
 			{
-				if(*((unsigned int*)ptr) > size)
-				{
-					ptr2 = (void*)((unsigned char*)ptr + size + 4);
-					*((unsigned int*)ptr2) = (*((unsigned int*)ptr) - size - 4);
-					*((unsigned int*)ptr) = size;
-				}
-				*((unsigned int*)ptr) = ALLOC_BIT(*((unsigned int*)ptr));
+				splitSpace(&ptr, &ptr2, size);
 				return ptr;
 			}
 			if(((char *)(ptr) - (char*)(buffer))+*((unsigned int*)ptr) + 4 >= bufferSize)
@@ -72,13 +71,7 @@ void* memAlloc(void* buffer, unsigned int size, unsigned int bufferSize)
 				*((unsigned int*)ptr) += *((unsigned int*)ptr2) + 4;
 				if(*((unsigned int*)ptr) >= size)
 				{
-					if(*((unsigned int*)ptr) > size)
-					{
-						ptr2 = (void*)((unsigned char*)ptr + size + 4);
-						*((unsigned int*)ptr2) = *((unsigned int*)ptr) - size - 4;
-						*((unsigned int*)ptr) = size;
-					}
-					*((unsigned int*)ptr) = ALLOC_BIT(*((unsigned int*)ptr));
+					splitSpace(&ptr, &ptr2, size);
 					return ptr;
 				}
 				ptr2=(void*)((char*)ptr2 + ((*((unsigned int*)ptr2)) + 4));
