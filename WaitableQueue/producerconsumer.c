@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <math.h>
 
-int messageID;
 waitableQueue producerToConsumer;
 waitableQueue consumerToProducer;
 int producersAmount = 0;
@@ -17,20 +16,22 @@ char** inMessages;
 void* producer(void* arg)
 {
 	char* msg;
-	int x = (rand()%10) + 1;
+	int x = (rand()%100) + 1;
 	int i = 0;
 	for(i = 0; i < x; i++)
 	{
 		printf("Producer enters message: %s", (char*)arg);
-		writeToQueue(producerToConsumer, arg);		
+		while(writeToQueue(producerToConsumer, arg) == -1){}
 	}
-	setFinished(producerToConsumer, 20);
-	while(getAmount(consumerToProducer) > 0 || !getFinished(consumerToProducer))
+	setFinished(producerToConsumer, producersAmount);
+	i = 0;
+	while((getAmount(consumerToProducer) > 0 || !getFinished(consumerToProducer))&&i < x)
 	{
 		msg = (char*)(readFromQueue(consumerToProducer));
 		if(msg != NULL)
 		{
 			printf("	Message read by producer: %s", msg);
+			i++;
 		}
 	}
 	return NULL;
@@ -39,17 +40,15 @@ void* producer(void* arg)
 void* consumer(void* arg)
 {
 	char* msg;
-	while(getAmount(producerToConsumer) > 0 || !getFinished(producerToConsumer))
+	msg = (char*)(readFromQueue(producerToConsumer));
+	while(msg != NULL)
 	{
-		msg = (char*)(readFromQueue(producerToConsumer));
-		if(msg != NULL)
-		{
-			printf("	Message read by consumer: %s", msg);
-		}
+		printf("	Message read by consumer: %s", msg);
 		printf("Consumer enters message: %s", (char*)arg);
 		writeToQueue(consumerToProducer, arg);
+		msg = (char*)(readFromQueue(producerToConsumer));
 	}
-	setFinished(consumerToProducer, 15);
+	setFinished(consumerToProducer, consumersAmount);
 	return NULL;
 }
 
@@ -174,14 +173,14 @@ int main()
 		destroyQueue(producerToConsumer);
 		return -1;
 	}
-	producers = createProducers(20);
+	producers = createProducers(200);
 	if(producers == NULL)
 	{
 		destroyQueue(producerToConsumer);
 		destroyQueue(consumerToProducer);
 		return -1;
 	}
-	consumers = createConsumers(15);
+	consumers = createConsumers(300);
 	if(consumers == NULL)
 	{
 		destroyQueue(producerToConsumer);

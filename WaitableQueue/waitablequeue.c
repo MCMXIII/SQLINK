@@ -83,7 +83,15 @@ int writeToQueue(waitableQueue q, void* message)
 	{
 		return -1;
 	}
-	sem_wait(&(q->full));
+	while(1)
+	{
+		if(sem_trywait(&(q->full)) == 0)
+		{
+			break;
+		}
+		if(q->amount == 10)
+			return -1;
+	}
 	pthread_mutex_lock(&(q->mutex));
 	sem_post(&(q->empty));
 	q->queue[q->amount++] = message;
