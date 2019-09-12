@@ -13,7 +13,7 @@ typedef struct {
 	char* path;
 } keyPath;
 typedef struct {
-	keyPath* kpQueue;
+	keyPath** kpQueue;
 	unsigned int amount;
 	sem_t full;
 	sem_t empty;
@@ -41,6 +41,8 @@ void zeroString(char* str, int len)
 }
 void findOrAdd(hashTable* t/*, FILE* output*/)
 {
+	int i = 0;
+	keyPath* queueItem;
 	unsigned char* key;
 	char* path;
 	char* value;
@@ -58,9 +60,14 @@ void findOrAdd(hashTable* t/*, FILE* output*/)
 	}
 	pthread_mutex_lock(&(q.mutex));
 	sem_post(&(q.full));
-	key = q.kpQueue->key;
-	path = q.kpQueue->path;
-	q.amount--;
+	queueItem = q.kpQueue[0];
+	for(i = 0; i < q.amount - 1; i++)
+	{
+		q.kpQueue[i] = q.kpQueue[i+1];
+	}
+	q.kpQueue[--q.amount] = NULL;
+	key = queueItem->key;
+	path = queueItem->path;
 	pthread_mutex_unlock(&(q.mutex));
 	if(path == NULL)
 	{
@@ -106,6 +113,7 @@ void findOrAdd(hashTable* t/*, FILE* output*/)
 	pthread_mutex_unlock(&hashMutex[hash((void*)key)%256]);
 	free(key);
 	free(path);
+	free(queueItem);
 }
 void findDuplicates(const char *name, hashTable* t, unsigned int isFirstCall/*, FILE* output*/)
 {
@@ -158,13 +166,13 @@ void findDuplicates(const char *name, hashTable* t, unsigned int isFirstCall/*, 
 			}
 			pthread_mutex_lock(&(q.mutex));
 			sem_post(&(q.empty));
-			q.kpQueue->key = (unsigned char*)malloc((strlen(key)+1)*sizeof(unsigned char));
-			q.kpQueue->path = (char*)malloc((strlen(path)+1)*sizeof(char));
-			strcpy(q.kpQueue->key, key);
-			q.kpQueue->key[strlen(key)] = '\0';
-			strcpy(q.kpQueue->path, path);
-			q.kpQueue->path[strlen(path)] = '\0';
-			q.amount++;
+			q.kpQueue[q.amount] = (keyPath*)malloc(sizeof(keyPath));
+			q.kpQueue[q.amount]->key = (unsigned char*)malloc((strlen(key)+1)*sizeof(unsigned char));
+			q.kpQueue[q.amount]->path = (char*)malloc((strlen(path)+1)*sizeof(char));
+			strcpy(q.kpQueue[q.amount]->key, key);
+			q.kpQueue[q.amount]->key[strlen(key)] = '\0';
+			strcpy(q.kpQueue[q.amount]->path, path);
+			q.kpQueue[q.amount++]->path[strlen(path)] = '\0';
 			pthread_mutex_unlock(&(q.mutex));
 			/*findOrAdd(t, key, path, output);*/
 			fclose(f);
@@ -190,7 +198,7 @@ void callThreads(hashTable* t)
 	int i = 0;
 	pthread_t hashThreads[8];
 	pthread_t mainT;
-	q.kpQueue = (keyPath*)malloc(sizeof(keyPath));
+	q.kpQueue = (keyPath**)malloc(10*sizeof(keyPath*));
 	q.amount = 0;
 	sem_init(&(q.full), 0, 1);	
 	sem_init(&(q.empty), 0, 1);
