@@ -218,4 +218,11 @@ void callThreads(hashTable* t)
 	{
 		pthread_join(hashThreads[i], NULL);
 	}
+	sem_destroy(&(q.full));
+	sem_destroy(&(q.empty));
+	pthread_mutex_destroy(&(q.mutex));
+	for(i = 0; i < 256; i++)
+	{
+		pthread_mutex_destroy(&(hashMutex[i]));
+	}
 }
