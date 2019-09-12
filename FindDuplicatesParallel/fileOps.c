@@ -164,6 +164,7 @@ void findDuplicates(const char *name, hashTable* t, unsigned int isFirstCall/*, 
 					break;
 				}
 			}
+			/*while(q.amount == 10){}*/
 			pthread_mutex_lock(&(q.mutex));
 			sem_post(&(q.empty));
 			q.kpQueue[q.amount] = (keyPath*)malloc(sizeof(keyPath));
@@ -196,25 +197,28 @@ void* subThread(void* t)
 void callThreads(hashTable* t)
 {
 	int i = 0;
-	pthread_t hashThreads[8];
+	pthread_t hashThreads[64];
 	pthread_t mainT;
-	q.kpQueue = (keyPath**)malloc(10*sizeof(keyPath*));
+	q.kpQueue = (keyPath**)malloc(64*sizeof(keyPath*));
 	q.amount = 0;
-	sem_init(&(q.full), 0, 1);	
-	sem_init(&(q.empty), 0, 1);
-	sem_wait(&(q.empty));
+	sem_init(&(q.full), 0, 64);	
+	sem_init(&(q.empty), 0, 64);
+	for(i = 0; i < 64; i++)
+	{
+		sem_wait(&(q.empty));
+	}
 	pthread_mutex_init(&(q.mutex), NULL);
 	for(i = 0; i < 256; i++)
 	{
 		pthread_mutex_init(&(hashMutex[i]), NULL);
 	}
 	pthread_create(&(mainT), NULL, &mainThread, (void*)t);
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 64; i++)
 	{
 		pthread_create(&(hashThreads[i]), NULL, &subThread, (void*)t);
 	}
 	pthread_join(mainT, NULL);
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 64; i++)
 	{
 		pthread_join(hashThreads[i], NULL);
 	}
