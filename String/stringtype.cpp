@@ -45,8 +45,11 @@ int string::length() const
 void string::setString(char* newString)
 {
 	delete [] str;
-	str = newString;
-	size = strlen(str);
+	size = strlen(newString);
+	str = new char[size+1];
+	strcpy(str, newString);
+	str[size] = '\0';
+	
 }
 const char* string::getString() const
 {
