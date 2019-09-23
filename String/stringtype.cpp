@@ -117,8 +117,9 @@ char& stringType::operator[](int index)
 {
 	if (index >= size || index < 0)
 	{
-		cout << "String index out of bound, exiting.\n";
-		exit(0);
+		char c = '\0';
+		char& cr = c;
+		return cr;
 	}
 	return str[index];
 }

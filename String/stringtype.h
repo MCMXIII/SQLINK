@@ -39,7 +39,6 @@ class stringType
 		int contains(const char* sub) const;
 		static int countStrings();
 	private:
-		static int num;
 		char* str;
 		int size;
 };
