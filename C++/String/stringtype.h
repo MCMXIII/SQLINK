@@ -43,6 +43,7 @@ class stringType
 		static int countStrings();
 		static int getCaseSens();
 		static int setCaseSens();
+		static int setCaseSens(int newSensitivity);
 		static int getCapacity();
 		static int setCapacity(int newCapacity);
 	private:

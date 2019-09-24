@@ -275,36 +275,75 @@ void stringType::prepend(const char* first)
 int stringType::contains(const stringType sub) const
 {
 	int i = 0, j = 0;
-	for(i = 0; i <= size - sub.size; i++)
+	if(caseSens)
 	{
-		j = 0;
-		while(str[i+j] == sub.str[j] && str[i+j] != '\0')
+		for(i = 0; i <= size - sub.size; i++)
 		{
-			j++;
+			j = 0;
+			while(str[i+j] == sub.str[j] && str[i+j] != '\0')
+			{
+				j++;
+			}
+			if(sub.str[j] == '\0')
+			{
+				return 1;
+			}
 		}
-		if(sub.str[j] == '\0')
+		return 0;
+	}
+	else
+	{
+		for(i = 0; i <= size - sub.size; i++)
 		{
-			return 1;
+			j = 0;
+			while(toupper(str[i+j]) == toupper(sub.str[j]) && str[i+j] != '\0')
+			{
+				j++;
+			}
+			if(sub.str[j] == '\0')
+			{
+				return 1;
+			}
 		}
+		return 0;
 	}
 	return 0;
 }
 int stringType::contains(const char* sub) const
 {
 	int i = 0, j = 0;
-	for(i = 0; i <= size - strlen(sub); i++)
+	if(caseSens)
 	{
-		j = 0;
-		while(str[i+j] == sub[j] && str[i+j] != '\0')
+		for(i = 0; i <= size - strlen(sub); i++)
 		{
-			j++;
+			j = 0;
+			while(str[i+j] == sub[j] && str[i+j] != '\0')
+			{
+				j++;
+			}
+			if(sub[j] == '\0')
+			{
+				return 1;
+			}
 		}
-		if(sub[j] == '\0')
-		{
-			return 1;
-		}
+		return 0;
 	}
-	return 0;
+	else
+	{
+		for(i = 0; i <= size - strlen(sub); i++)
+		{
+			j = 0;
+			while(toupper(str[i+j]) == toupper(sub[j]) && str[i+j] != '\0')
+			{
+				j++;
+			}
+			if(sub[j] == '\0')
+			{
+				return 1;
+			}
+		}
+		return 0;
+	}	
 }
 int stringType::firstIndex(const char c) const
 {
@@ -372,6 +411,19 @@ int stringType::setCaseSens()
 {
 	stringType::caseSens = (stringType::caseSens + 1) % 2;
 	return (stringType::caseSens + 1) % 2;
+}
+int stringType::setCaseSens(int newSensitivity)
+{
+	int old = stringType::caseSens;
+	if(newSensitivity == 0 || newSensitivity == 1)
+	{
+		stringType::caseSens = newSensitivity;
+	}
+	else
+	{
+		cout << "Invalid value of case sensitivity!\n";
+	}
+	return old;
 }
 int stringType::getCapacity()
 {

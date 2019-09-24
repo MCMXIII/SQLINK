@@ -85,8 +85,11 @@ int main()
 				action = 12;
 				break;
 			case 13:
-				x = stringType::setCaseSens();
+				printf("Enter a new Sensitivity (negative values to flip sensitivity):\n");
+				scanf("%d", &action);
+				x = action < 0?stringType::setCaseSens():stringType::setCaseSens(action);
 				printf("Previous case sensitivity was %d, current case sensitivity is %d!\n", x, stringType::getCaseSens());
+				action = 13;
 				break;
 			case 14:
 				printf("Enter a new capacity:\n");
