@@ -27,9 +27,9 @@ class stringType
 		int operator!=(const char* other);
 		char& operator[](int index);
 		stringType operator()(int index, unsigned int length);
-		int length() const;
+		int length() const { return size; }
 		void setString(char* newString);
-		const char* getString() const;
+		const char* getString() const { return str; }
 		int compare(const stringType other) const;
 		void print() const;
 		void toUpper();

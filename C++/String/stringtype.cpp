@@ -190,10 +190,6 @@ stringType stringType::operator()(int index, unsigned int length)
 	stringType st(subStr);
 	return st;
 }
-int stringType::length() const
-{
-	return size;
-}
 void stringType::setString(char* newString)
 {
 	if(newString != 0)
@@ -208,10 +204,6 @@ void stringType::setString(char* newString)
 		strcpy(str, newString);
 		str[size] = '\0';
 	}
-}
-const char* stringType::getString() const
-{
-	return str;
 }
 int stringType::compare(const stringType other) const
 {
