@@ -70,7 +70,7 @@ stringType& stringType::operator=(const stringType& other)
 }
 stringType& stringType::operator+=(const stringType other)
 {
-	if(other.str == 0)
+	if(other.str == 0 || this == 0 || this->str == 0)
 	{
 		return *this;
 	}
@@ -89,7 +89,7 @@ stringType& stringType::operator+=(const stringType other)
 }
 stringType& stringType::operator+=(const char* other)
 {
-	if(other == 0)
+	if(other == 0 || this == 0 || this->str == 0)
 	{
 		return *this;
 	}
@@ -169,7 +169,7 @@ int stringType::operator!=(const char* other)
 }
 char& stringType::operator[](int index)
 {
-	if (index >= size || index < 0)
+	if (index >= size || index < 0 || this == 0 || str == 0)
 	{
 		char c = '\0';
 		char& cr = c;
@@ -179,7 +179,7 @@ char& stringType::operator[](int index)
 }
 stringType stringType::operator()(int index, unsigned int length)
 {
-	if (index >= size || index < 0)
+	if (index >= size || index < 0 || this == 0 || str == 0)
 	{
 		stringType st;
 		return st;
@@ -207,6 +207,10 @@ void stringType::setString(char* newString)
 }
 int stringType::compare(const stringType other) const
 {
+	if (other.str == 0 || this == 0 || this->str == 0)
+	{
+		return -256;
+	}
 	if(caseSens)
 	{
 		return strcmp(str, other.str);
@@ -246,6 +250,10 @@ void stringType::toLower()
 }
 void stringType::prepend(const stringType first)
 {
+	if(first.str == 0 || this == 0 || this->str == 0)
+	{
+		return;
+	}
 	char* oldString = new char[size+1];
 	strcpy(oldString, str);
 	delete [] str;
@@ -260,6 +268,10 @@ void stringType::prepend(const stringType first)
 }
 void stringType::prepend(const char* first)
 {
+	if(first == 0 || this == 0 || this->str == 0)
+	{
+		return;
+	}
 	char* oldString = new char[size+1];
 	strcpy(oldString, str);
 	delete [] str;
@@ -274,6 +286,8 @@ void stringType::prepend(const char* first)
 }
 int stringType::contains(const stringType sub) const
 {
+	if(this == 0)
+		return -1;
 	int i = 0, j = 0;
 	if(caseSens)
 	{
@@ -311,6 +325,8 @@ int stringType::contains(const stringType sub) const
 }
 int stringType::contains(const char* sub) const
 {
+	if(this == 0)
+		return -1;
 	int i = 0, j = 0;
 	if(caseSens)
 	{
@@ -347,6 +363,8 @@ int stringType::contains(const char* sub) const
 }
 int stringType::firstIndex(const char c) const
 {
+	if(this == 0)
+		return -1;
 	int i = 0;
 	if(caseSens)
 	{
@@ -372,6 +390,8 @@ int stringType::firstIndex(const char c) const
 }
 int stringType::lastIndex(const char c) const
 {
+	if(this == 0)
+		return -1;
 	int i = 0, lIndex = -1;
 	if(caseSens)
 	{
