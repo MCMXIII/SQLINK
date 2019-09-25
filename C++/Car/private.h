@@ -10,16 +10,16 @@ class private_t:public car_t
 {
 	public:
 		private_t();
-		bus_t(unsigned int c, unsigned int s, unsigned int l);
-		bus_t(const bus_t& other);
-		bus_t& operator=(const bus_t& other);
-		unsigned int getSeats() { return seats; }
-		void setSeats(unsigned int s) { seats = s; }
-		unsigned int getLine() { return line; }
-		void setLine(unsigned int l) { line = l; }
-		~bus_t() {}
+		private_t(unsigned int c, double s);
+		private_t(const private_t& other);
+		private_t& operator=(const private_t& other);
+		double getSpeed() { return speed; }
+		void setSpeed(double s) { speed = s; }
+		void accelerate() { speed+=10.0; }
+		void reduceSpeed() { speed-=10.0; }
+		~private_t() {}
 	private:
-		unsigned double speed;
+		double speed;
 };
 	/*ostream& operator<<(ostream& os, const stringType& s);
 	istream& operator>>(istream& is, stringType& s);*/

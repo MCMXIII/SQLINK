@@ -13,13 +13,13 @@ class car_t
 		car_t(string n, unsigned int c);
 		car_t(const car_t& other);
 		car_t& operator=(const car_t& other);
-		bool operator<(const car_t other) { return capacity < other.capacity; }
-		bool operator>(const car_t other) { return capacity > other.capacity; }
-		bool operator<=(const car_t other) { return capacity <= other.capacity; }
-		bool operator>=(const car_t other) { return capacity >= other.capacity; }
-		bool operator==(const car_t other) { return capacity == other.capacity; }
-		bool operator!=(const car_t other) { return capacity != other.capacity; }
-		bool compare(const car_t other) const { return name.compare(name) == 0; }
+		bool operator<(const car_t& other) { return capacity < other.capacity; }
+		bool operator>(const car_t& other) { return capacity > other.capacity; }
+		bool operator<=(const car_t& other) { return capacity <= other.capacity; }
+		bool operator>=(const car_t& other) { return capacity >= other.capacity; }
+		bool operator==(const car_t& other) { return capacity == other.capacity; }
+		bool operator!=(const car_t& other) { return capacity != other.capacity; }
+		bool compare(const car_t& other) const { return name.compare(other.name) == 0; }
 		unsigned int getId() { return carId; }
 		string getName() { return name; }
 		gearType getGear() { return gear; }
@@ -28,7 +28,7 @@ class car_t
 		void setCapacity(unsigned int c) { capacity = c; }
 	protected:
 		~car_t() {}
-		static unsigned int generateId() { id++; return id - 1; }
+		static unsigned int generateId() { int newId = id++; return newId; }
 	private:
 		static unsigned int id;
 		unsigned int carId;
