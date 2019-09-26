@@ -16,7 +16,7 @@ class memManager_t
 		virtual int write(void* buffer, const char* bytes);
 		virtual char write(void* buffer, const unsigned int pos, const char* bytes);
 	protected:
-		~memManager_t() {}
+		virtual ~memManager_t() {}
 	private:
 		unsigned int size;
 		unsigned int position;
