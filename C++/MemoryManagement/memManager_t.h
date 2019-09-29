@@ -10,16 +10,15 @@ class memManager_t
 		void setPosition(const unsigned int p) { if(p <= size) position = p; }
 		bool isEmpty() const { return size == 0; }
 		unsigned int getSize() const { return size; }
-		unsigned int getCapacity() const { return capacity; }
-		virtual char* read(const void* buffer, unsigned int bytes) const { return 0; }
-		virtual char* read(const void* buffer, const unsigned int pos, unsigned int bytes) const { return 0; }
-		virtual int write(void* buffer, const char* bytes) { return 0; }
-		virtual char write(void* buffer, const unsigned int pos, const char* bytes) { return 0; }
+		virtual char* read(/*const void* buffer, */void* output, unsigned int bytes) { return 0; }
+		virtual char* read(/*const void* buffer, */void* output, const unsigned int pos, unsigned int bytes) { return 0; }
+		virtual unsigned int write(/*void* buffer, */const char* bytes) { return 0; }
+		virtual unsigned int write(/*void* buffer, */const unsigned int pos, const char* bytes) { return 0; }
 	protected:
 		virtual ~memManager_t() {}
-	private:
 		unsigned int size;
 		unsigned int position;
+	private:
 };
 
 #endif
