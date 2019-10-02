@@ -1,23 +1,24 @@
 #include "memManager_t.h"
+#include "memPage_t.h"
+#include <vector>
 
-#ifndef MEMPAGE_T_H
-#define MEMPAGE_T_H
+#ifndef MEMPOOL_T_H
+#define MEMPOOL_T_H
 
 using namespace std;
-class memPage_t : memManager_t
+class memPool_t : memManager_t
 {
 	public:
-		memPage_t(unsigned int cap) { size = 0; position = 0; capacity = cap; buffer = new char[cap]; }
-		virtual ~memPage_t() { delete [] buffer; }
-		bool isFull() const { return size == capacity; }
-		unsigned int getCapacity() const { return capacity; }
-		/*void setCapacity(unsigned int newCap);*/
+		memPool_t(unsigned int cap) { size = 0; position = 0; capacity = cap; pbuffer.insert(pbuffer.end(), new memPage_t(capacity));  }
+		virtual ~memPool_t() { int i; for(i = 0; i <= size/capacity; i++) delete pbuffer[i]; }
 		virtual char* read(void* output, unsigned int bytes);
 		virtual char* read(void* output, const unsigned int pos, unsigned int bytes);
 		virtual unsigned int write(const void* bytes, unsigned int amountToWrite);
 		virtual unsigned int write(const unsigned int pos, const void* bytes , unsigned int amountToWrite);
+		unsigned int getCapacity() const { return capacity; }
+		void setCapacity(unsigned int newCap);
 	private:
-		char* buffer;
+		vector<memPage_t*> pbuffer;
 		unsigned int capacity;
 		/*unsigned int size;
 		unsigned int position;*/

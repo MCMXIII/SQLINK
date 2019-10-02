@@ -1,6 +1,31 @@
 ﻿#include "memPage_t.h"
 #include <string.h>
+#include <iostream>
 
+/*void memPage_t::setCapacity(unsigned int newCap)
+{
+	char* tempBuffer = new char[capacity];
+	if(newCap > capacity)
+	{
+		memcpy((void*)tempBuffer, (void*)buffer, capacity);
+		delete [] buffer;
+		buffer = new char[newCap];
+		memcpy((void*)buffer, (void*)tempBuffer, capacity);
+		capacity = newCap;
+	}
+	else if(capacity > newCap)
+	{
+		if(position > newCap)
+		{
+			position = newCap;
+		}
+		memcpy((void*)tempBuffer, (void*)buffer, newCap);
+		delete [] buffer;
+		buffer = new char[newCap];
+		memcpy((void*)buffer, (void*)tempBuffer, newCap);
+		capacity = newCap;
+	}
+}*/
 char* memPage_t::read(void* output, unsigned int bytes)
 {
 	if(output != 0)
@@ -16,72 +41,59 @@ char* memPage_t::read(void* output, unsigned int bytes)
 			position += bytes;
 		}
 	}
+	else
+	{
+		cout << "Undefined output buffer!\n";	
+	}
 	return (char*)output;
 }
 char* memPage_t::read(void* output, const unsigned int pos, unsigned int bytes)
 {
-	if(output != 0 && pos <= size)
+	if(pos <= size)
 	{
 		position = pos;
-		if(position + bytes > size)
-		{
-			memcpy(output, (void *)(&(buffer[position])), size - position);
-			position = size;
-		}
-		else
-		{
-			memcpy(output, (void *)(&(buffer[position])), bytes);
-			position += bytes;
-		}
+		read(output, bytes);
+	}
+	else
+	{
+		cout << "Invalid position!\n";
 	}
 	return (char*)output;
 }
-unsigned int memPage_t::write(const char* bytes)
+unsigned int memPage_t::write(const void* bytes, unsigned int amountToWrite)
 {
-	int ret;
-	if(position + strlen(bytes) > capacity)
+	if(bytes == 0)
 	{
-		memcpy((void *)(&(buffer[position])), (void *)bytes, capacity - position);
+		cout << "Undefined input, no write was done!\n";
+		return 0;
+	}
+	unsigned int ret;
+	if(position + amountToWrite > capacity)
+	{
+		memcpy((void *)(&(buffer[position])), bytes, capacity - position);
 		ret = capacity - position;		
 		size = capacity;
 		position = capacity;
 	}
 	else
 	{
-		memcpy((void *)(&(buffer[position])), (void *)bytes, strlen(bytes));
-		if(size < position + strlen(bytes))
+		memcpy((void *)(&(buffer[position])), bytes, amountToWrite);
+		if(size < position + amountToWrite)
 		{
-			size = position + strlen(bytes);
+			size = position + amountToWrite;
 		}
-		position += strlen(bytes);
-		ret = strlen(bytes);
+		position += amountToWrite;
+		ret = amountToWrite;
 	}
 	return ret;
 }
-unsigned int memPage_t::write(const unsigned int pos, const char* bytes)
+unsigned int memPage_t::write(const unsigned int pos, const void* bytes, unsigned int amountToWrite)
 {
 	if(pos > size)
 	{
+		cout << "Invalid position!\n";
 		return 0;
 	}
-	int ret;
 	position = pos;
-	if(position + strlen(bytes) > capacity)
-	{
-		memcpy((void *)(&(buffer[position])), (void *)bytes, capacity - position);
-		ret = capacity - position;		
-		size = capacity;
-		position = capacity;
-	}
-	else
-	{
-		memcpy((void *)(&(buffer[position])), (void *)bytes, strlen(bytes));
-		if(size < position + strlen(bytes))
-		{
-			size = position + strlen(bytes);
-		}
-		position += strlen(bytes);
-		ret = strlen(bytes);
-	}
-	return ret;
+	return write(bytes, amountToWrite);
 }

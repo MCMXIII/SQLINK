@@ -12,8 +12,8 @@ class memManager_t
 		unsigned int getSize() const { return size; }
 		virtual char* read(/*const void* buffer, */void* output, unsigned int bytes) { return 0; }
 		virtual char* read(/*const void* buffer, */void* output, const unsigned int pos, unsigned int bytes) { return 0; }
-		virtual unsigned int write(/*void* buffer, */const char* bytes) { return 0; }
-		virtual unsigned int write(/*void* buffer, */const unsigned int pos, const char* bytes) { return 0; }
+		virtual unsigned int write(/*void* buffer, */const void* bytes , unsigned int amountToWrite) { return 0; }
+		virtual unsigned int write(/*void* buffer, */const unsigned int pos, const void* bytes, unsigned int amountToWrite) { return 0; }
 	protected:
 		virtual ~memManager_t() {}
 		unsigned int size;
