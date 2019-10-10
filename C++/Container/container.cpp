@@ -64,7 +64,7 @@ int main()
 	cout << "\n";
 	cout << "Is empty after remove all? " << c.isEmpty() << "\n";
 	cout << "Num of elements is " << c.numOfElements() << "\n\n";
-	cout << "Floats list:\n";
+	cout << "Floats list from 1.5, 2.5, 3.5, 4.5, 5.5:\n";
 	TContainer_t<float, list<float*> > c2;
 	cout << "Is empty before initialization? " << c2.isEmpty() << "\n";
 	float arr3[5] = {1.5, 2.5, 3.5, 4.5, 5.5};
