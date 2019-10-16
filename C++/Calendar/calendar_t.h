@@ -25,11 +25,15 @@
 			public:
 				Calendar_t() {};
 				~Calendar_t() {};
-				void insert(const Meeting_t* meeting);
-				const Meeting_t* remove(const Meeting_t* meeting);
+				void insert(Meeting_t* meeting);
+				const Meeting_t* remove(const float& hour);
 				const Meeting_t* find(const float& hour);
-				void clean() {day.clear();}
+				void clean();
+				void writeToFile(const char* name);
+				void readFromFile(const char* name);
 			private:
 				map<float, Meeting_t*, Compare> day;
+				const Meeting_t* nextIndex(const float& hour);
+				const Meeting_t* previousIndex(const float& hour);
 		};
 #endif
