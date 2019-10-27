@@ -62,7 +62,7 @@ void analyzer_t::analyze(deque<string>& tokens)
 		line++;
 		return;
 	}
-	if(!afterMain && !notFoundMain && tokens[0] != "main" && tokens[1] != "{")
+	if(!afterMain && !notFoundMain && tokens[0] != "main")
 	{
 		cout << fileName << ':' << line << " - error, illegal - no 'main' before" << endl;
 		notFoundMain = true;
