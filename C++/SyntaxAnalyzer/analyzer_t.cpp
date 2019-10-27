@@ -228,7 +228,7 @@ bool analyzer_t::isKeyword(const string& token)
 	return false;
 
 }
-bool analyzer_t::isLegalVarName(const string& token, int lineNum)
+bool analyzer_t::isLegalVarName(const string& token, const int& lineNum)
 {
 	if((!isalpha(token[0]) && token[0] != '_') || isKeyword(token))
 	{

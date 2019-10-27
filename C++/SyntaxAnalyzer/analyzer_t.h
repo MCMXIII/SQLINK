@@ -41,7 +41,7 @@ class analyzer_t{
 		void cleanAll();
 		bool isType(const string& token);
 		bool isKeyword(const string& token);
-		bool isLegalVarName(const string& token, int line);
+		bool isLegalVarName(const string& token, const int& line);
 		bool isDeclared(const string& token);
 		analyzer_t(const analyzer_t& other) {}
 		analyzer_t& operator=(const analyzer_t& other);
