@@ -18,7 +18,6 @@ class parser_t{
 		void parse(const string& name);
 		~parser_t();
 	private:
-		unsigned int lineNumber;
 		string fileName;
 		fstream stream;
 		tokenizer_t* tokenizer;

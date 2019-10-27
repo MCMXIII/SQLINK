@@ -12,39 +12,6 @@ string* analyzer_t::keywords = new string[11];
 string analyzer_t::nsDelimiters = "()[]{};<>=+-*&";
 
 using namespace std;
-		
-void find3InARow(int& counter, const string& fileName, const string& token, const char& oper)
-{
-	if(token[0] == oper)
-	{
-		counter++;
-		if(counter >= 3)
-		{
-			cout << fileName << ':' << token << " - error, no operator +++ or ---" << endl;
-		}
-	}
-	else
-	{
-		counter = 0;
-	}
-}
-void findUnordered(int& counter, const string& fileName, const int& lineNum, const char& opening)
-{
-	char closing;
-	switch(opening)
-	{
-		case '(':	closing = ')'; break;
-		case '{':	closing = '}'; break;
-		case '[':	closing = ']'; break;
-		default: break;
-	}
-	counter--;
-	if(counter < 0) 
-	{
-		cout << fileName << ':' << lineNum << " - error, \"" << closing << "\" without \"" << opening << "\"" << endl;
-		counter = 0;
-	}
-}
 
 void analyzer_t::init(const string& name)
 {
@@ -78,8 +45,8 @@ void analyzer_t::analyze(deque<string>& tokens)
 			continue;
 		}
 		doIfBracket(token);
-		find3InARow(plusCounter, fileName, token, '+');
-		find3InARow(minusCounter, fileName, token, '-');
+		find3InARow(line, token, '+');
+		find3InARow(line, token, '-');
 		if(token == "if" || token == "else")
 		{
 			checkIfElse(token);
@@ -114,25 +81,77 @@ void analyzer_t::declareKeywords()
 		analyzer_t::keywords[i] = keywordsArr[i];
 	}
 }
+void analyzer_t::findUnordered(const int& lineNum, const char& opening)
+{
+	int* bracketType;
+	char closing;
+	switch(opening)
+	{
+		case '(':	bracketType = &parentheses; closing = ')'; break;
+		case '{':	bracketType = &braces; closing = '}'; break;
+		case '[':	bracketType = &brackets; closing = ']'; break;
+		default: break;
+	}
+	(*bracketType)--;
+	if((*bracketType) < 0) 
+	{
+		cout << fileName << ':' << lineNum << " - error, \"" << closing << "\" without \"" << opening << "\"" << endl;
+		(*bracketType) = 0;
+	}
+}
 void analyzer_t::doIfBracket(const string& token)
 {
 	switch(token[0])
 	{
 		case '(': parentheses++;
 				break;
-		case ')': findUnordered(parentheses, fileName, line, '(');
+		case ')': findUnordered(line, '(');
 				break;
 		case '{': braces++;
 				break;
-		case '}': findUnordered(braces, fileName, line, '{');
+		case '}': findUnordered(line, '{');
 				break;
 		case '[': brackets++;
 				break;
-		case ']': findUnordered(brackets, fileName, line, '[');
+		case ']': findUnordered(line, '[');
 				break;
 		default: break;			
 	}
 		
+}
+void analyzer_t::find3InARow(const int& lineNum, const string& token, const char& oper)
+{
+	switch(oper)
+	{
+		case '+':
+			if(token[0] == oper)
+			{
+				plusCounter++;
+				if(plusCounter >= 3)
+				{
+					cout << fileName << ':' << lineNum << " - error, no operator +++" << endl;
+				}
+			}
+			else
+			{
+				plusCounter = 0;
+			}
+			break;
+		case '-':
+			if(token[0] == oper)
+			{
+				minusCounter++;
+				if(minusCounter >= 3)
+				{
+					cout << fileName << ':' << lineNum << " - error, no operator ---" << endl;
+				}
+			}
+			else
+			{
+				minusCounter = 0;
+			}
+			break;
+	}
 }
 void analyzer_t::checkIfElse(const string& token)
 {

@@ -27,12 +27,14 @@ class analyzer_t{
 		bool afterMain;
 		bool notFoundMain;
 		string fileName;
+		vector<string>* declared;
 		static string* types;
 		static string* keywords;
 		static string nsDelimiters;
-		vector<string>* declared;
 		void declareKeywords();
+		void findUnordered(const int& lineNum, const char& opening);
 		void doIfBracket(const string& token);
+		void find3InARow(const int& lineNum, const string& token, const char& oper);
 		void checkIfElse(const string& token);
 		void checkTokenValue(bool& isAfterType, const string& token);
 		void checkBracketsFinally();
@@ -41,6 +43,8 @@ class analyzer_t{
 		bool isKeyword(const string& token);
 		bool isLegalVarName(const string& token, int line);
 		bool isDeclared(const string& token);
+		analyzer_t(const analyzer_t& other) {}
+		analyzer_t& operator=(const analyzer_t& other);
 		
 };
 
