@@ -230,14 +230,14 @@ bool analyzer_t::isKeyword(const string& token)
 }
 bool analyzer_t::isLegalVarName(const string& token, int lineNum)
 {
-	if(!isalpha(token[0]) || isKeyword(token))
+	if((!isalpha(token[0]) && token[0] != '_') || isKeyword(token))
 	{
 		cout << fileName << ':' << lineNum << " - error, illegal variable name" << endl;
 		return false;
 	}
 	for(int i = 1; i < token.length(); i++)
 	{
-		if(!isalnum(token[i]))
+		if(!isalnum(token[i]) && token[0] != '_')
 		{
 			cout << fileName << ':' << lineNum << " - error, illegal variable name" << endl;
 			return false;
