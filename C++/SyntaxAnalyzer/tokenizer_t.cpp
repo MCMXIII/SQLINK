@@ -2,7 +2,6 @@
 #include <string>
 #include <deque>
 #include <sstream>
-#include <utility>
 #include <ctype.h>
 #include "tokenizer_t.h"
 
@@ -21,7 +20,7 @@ int calculateSizeToRead(const string& line, const int& i, const string& del)
 	}
 }
 
-void tokenizer_t::tokenize(const string& line, const int& lineNum, deque<pair<int, string> >& tokens)
+void tokenizer_t::tokenize(const string& line, deque<string>& tokens)
 {
 	stringstream sstream(line);
 	int i = 0;
@@ -50,10 +49,7 @@ void tokenizer_t::tokenize(const string& line, const int& lineNum, deque<pair<in
 		if(!isspace(token[0]) && sizeToRead > 0)
 		{
 			string tokenStr(token);
-			pair<int, string> p;
-			p.first = lineNum;
-			p.second = tokenStr;
-			tokens.push_back(p);
+			tokens.push_back(tokenStr);
 		}
 		i+=sizeToRead;
 		delete [] token;

@@ -4,16 +4,17 @@
 #include <fstream>
 #include <string>
 #include <deque>
-#include <utility>
 #include <vector>
 
 using namespace std;
 
 class analyzer_t{
 	public:
-		analyzer_t() { parentheses = 0; braces = 0; brackets = 0; plusCounter = 0; minusCounter = 0; ifCounter = 0; }
+		analyzer_t() { line = 1; parentheses = 0; braces = 0; brackets = 0; plusCounter = 0; minusCounter = 0; ifCounter = 0; }
 		~analyzer_t() { /*delete declared;*/ }
-		void analyze(const string& name, deque<pair<int, string> >& tokens);
+		void init(const string& name);
+		void analyze(deque<string>& tokens);
+		void finish();
 	private:
 		int parentheses;
 		int braces;
@@ -21,15 +22,19 @@ class analyzer_t{
 		int plusCounter;
 		int minusCounter;
 		int ifCounter;
+		int line;
+		bool typeFlag;
+		bool afterMain;
+		bool notFoundMain;
 		string fileName;
 		static string* types;
 		static string* keywords;
 		static string nsDelimiters;
 		vector<string>* declared;
 		void declareKeywords();
-		void doIfBracket(const pair<int, string>& token);
-		void checkIfElse(const pair<int, string>& token);
-		void checkTokenValue(bool& isAfterType, const pair<int, string>& token);
+		void doIfBracket(const string& token);
+		void checkIfElse(const string& token);
+		void checkTokenValue(bool& isAfterType, const string& token);
 		void checkBracketsFinally();
 		void cleanAll();
 		bool isType(const string& token);

@@ -4,7 +4,6 @@
 #include <fstream>
 #include <string>
 #include <deque>
-#include <utility>
 
 class analyzer_t;
 class tokenizer_t;
@@ -24,7 +23,7 @@ class parser_t{
 		fstream stream;
 		tokenizer_t* tokenizer;
 		analyzer_t* analyzer;
-		deque<pair<int, string> > tokens;
+		deque<string> tokens;
 		parser_t(const parser_t& other) {}
 		parser_t& operator=(const parser_t& other);
 };

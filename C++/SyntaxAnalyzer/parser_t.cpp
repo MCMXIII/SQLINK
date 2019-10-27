@@ -1,7 +1,6 @@
 #include <fstream>
 #include <string>
 #include <deque>
-#include <utility>
 #include <iostream>
 #include "tokenizer_t.h"
 #include "analyzer_t.h"
@@ -19,13 +18,15 @@ void parser_t::parse(const string& name)
 		return;
 	}
 	char line[513];
+	(*analyzer).init(name);
 	while(stream.getline(line, 513))
 	{
 		string lineStr(line);
-		(*tokenizer).tokenize(lineStr, lineNumber, tokens);
+		(*tokenizer).tokenize(lineStr, tokens);
+		(*analyzer).analyze(tokens);
 		lineNumber++;
 	}
-	(*analyzer).analyze(name, tokens);
+	(*analyzer).finish();
 	closeFile();
 	cout << endl;
 }

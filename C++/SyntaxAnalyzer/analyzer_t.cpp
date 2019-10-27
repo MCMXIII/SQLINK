@@ -13,14 +13,14 @@ string analyzer_t::nsDelimiters = "()[]{};<>=+-*&";
 
 using namespace std;
 		
-void find3InARow(int& counter, const string& fileName, const pair<int, string>& token, const char& oper)
+void find3InARow(int& counter, const string& fileName, const string& token, const char& oper)
 {
-	if(token.second[0] == oper)
+	if(token[0] == oper)
 	{
 		counter++;
 		if(counter >= 3)
 		{
-			cout << fileName << ':' << token.first << " - error, no operator +++ or ---" << endl;
+			cout << fileName << ':' << token << " - error, no operator +++ or ---" << endl;
 		}
 	}
 	else
@@ -28,7 +28,7 @@ void find3InARow(int& counter, const string& fileName, const pair<int, string>& 
 		counter = 0;
 	}
 }
-void findUnordered(int& counter, const string& fileName, const int& row, const char& opening)
+void findUnordered(int& counter, const string& fileName, const int& lineNum, const char& opening)
 {
 	char closing;
 	switch(opening)
@@ -36,50 +36,66 @@ void findUnordered(int& counter, const string& fileName, const int& row, const c
 		case '(':	closing = ')'; break;
 		case '{':	closing = '}'; break;
 		case '[':	closing = ']'; break;
-		befault: break;
+		default: break;
 	}
 	counter--;
 	if(counter < 0) 
 	{
-		cout << fileName << ':' << row << " - error, \"" << closing << "\" without \"" << opening << "\"" << endl;
+		cout << fileName << ':' << lineNum << " - error, \"" << closing << "\" without \"" << opening << "\"" << endl;
 		counter = 0;
 	}
 }
 
-void analyzer_t::analyze(const string& name, deque<pair<int, string> >& tokens)
+void analyzer_t::init(const string& name)
 {
-	declared = new vector<string>();
-	fileName = name;
+	typeFlag = false;
+	afterMain = false;
+	notFoundMain = false;
 	declareKeywords();
-	bool typeFlag = false;
-	bool afterMain = false;
-	if(tokens[0].second != "main" && tokens[1].second != "{")
-		cout << fileName << ':' << tokens[0].first << " - error, illegal - no 'main' before" << endl;
+	fileName = name;
+	declared = new vector<string>();
+}
+void analyzer_t::analyze(deque<string>& tokens)
+{
+	if(tokens.size() == 0)
+	{
+		line++;
+		return;
+	}
+	if(!afterMain && !notFoundMain && tokens[0] != "main" && tokens[1] != "{")
+	{
+		cout << fileName << ':' << line << " - error, illegal - no 'main' before" << endl;
+		notFoundMain = true;
+	}
 	while(tokens.size() > 0)
 	{
-		pair <int, string> p = tokens[0];
+		string token = tokens[0];
 		tokens.pop_front();
-		if(p.second == "main" && afterMain == false)
+		if(token == "main" && afterMain == false)
 		{
-			(*declared).push_back(p.second);
+			(*declared).push_back(token);
 			afterMain = true;
 			continue;
 		}
-		doIfBracket(p);
-		find3InARow(plusCounter, fileName, p, '+');
-		find3InARow(minusCounter, fileName, p, '-');
-		if(p.second == "if" || p.second == "else")
+		doIfBracket(token);
+		find3InARow(plusCounter, fileName, token, '+');
+		find3InARow(minusCounter, fileName, token, '-');
+		if(token == "if" || token == "else")
 		{
-			checkIfElse(p);
+			checkIfElse(token);
 			continue;
 		}
-		if(isType(p.second) && !typeFlag)
+		if(isType(token) && !typeFlag)
 		{
 			typeFlag = true;
 			continue;
 		}
-		checkTokenValue(typeFlag, p);
+		checkTokenValue(typeFlag, token);
 	}
+	line++;
+}
+void analyzer_t::finish()
+{
 	checkBracketsFinally();
 	cleanAll();
 }
@@ -98,69 +114,69 @@ void analyzer_t::declareKeywords()
 		analyzer_t::keywords[i] = keywordsArr[i];
 	}
 }
-void analyzer_t::doIfBracket(const pair<int, string>& token)
+void analyzer_t::doIfBracket(const string& token)
 {
-	switch(token.second[0])
+	switch(token[0])
 	{
 		case '(': parentheses++;
 				break;
-		case ')': findUnordered(parentheses, fileName, token.first, '(');
+		case ')': findUnordered(parentheses, fileName, line, '(');
 				break;
 		case '{': braces++;
 				break;
-		case '}': findUnordered(braces, fileName, token.first, '{');
+		case '}': findUnordered(braces, fileName, line, '{');
 				break;
 		case '[': brackets++;
 				break;
-		case ']': findUnordered(brackets, fileName, token.first, '[');
+		case ']': findUnordered(brackets, fileName, line, '[');
 				break;
 		default: break;			
 	}
 		
 }
-void analyzer_t::checkIfElse(const pair<int, string>& token)
+void analyzer_t::checkIfElse(const string& token)
 {
-	if(token.second == "if")
+	if(token == "if")
 	{
 		ifCounter++;
 	}
-	if(token.second == "else")
+	if(token == "else")
 	{
 		ifCounter--;
 		if(ifCounter < 0)
 		{
-			cout << fileName << ':' << token.first << " - error, \"else\" without \"if\"" << endl;
+			cout << fileName << ':' << line << " - error, \"else\" without \"if\"" << endl;
 			ifCounter = 0;
 		}
 	}
 }
-void analyzer_t::checkTokenValue(bool& isAfterType, const pair<int, string>& token)
+void analyzer_t::checkTokenValue(bool& isAfterType, const string& token)
 {
 	if(isAfterType)
 	{
 		isAfterType = false;			
-		if(isLegalVarName(token.second, token.first))
+		if(isLegalVarName(token, line))
 		{
-			if(isDeclared(token.second))
+			if(isDeclared(token))
 			{
-				cout << fileName << ':' << token.first << " - error, variable '" << token.second << "' already declared" << endl;
+				cout << fileName << ':' << line << " - error, variable '" << token << "' already declared" << endl;
 			}
 			else
 			{
-				(*declared).push_back(token.second);
+				(*declared).push_back(token);
 			}
 		}
 	}
-	else if(strchr(analyzer_t::nsDelimiters.c_str(), token.second[0]) == 0)
+	else if(strchr(analyzer_t::nsDelimiters.c_str(), token[0]) == 0)
 	{
 		bool isNumeric = true;
-		for(int i = 0; i < token.second.length(); i++)
+		for(int i = 0; i < token.length(); i++)
 		{
-			if(!isdigit(token.second[i])) isNumeric = false;
+			if(!isdigit(token[i])) isNumeric = false;
 		}
-		if(!isNumeric && !isDeclared(token.second) && !isKeyword(token.second))
+		if(!isNumeric && !isDeclared(token) && !isKeyword(token))
 		{
-			cout << fileName << ':' << token.first << " - error, '" << token.second << "' is not declared" << endl;
+			cout << fileName << ':' << line << " - error, '" << token << "' is not declared" << endl;
 		}
 	}
 }
@@ -172,7 +188,7 @@ void analyzer_t::checkBracketsFinally()
 }
 void analyzer_t::cleanAll()
 {
-	parentheses = 0; braces = 0; brackets = 0; plusCounter = 0; minusCounter = 0; ifCounter = 0; (*declared).clear();
+	line = 1; parentheses = 0; braces = 0; brackets = 0; plusCounter = 0; minusCounter = 0; ifCounter = 0; (*declared).clear();
 }
 bool analyzer_t::isType(const string& token)
 {
@@ -193,24 +209,24 @@ bool analyzer_t::isKeyword(const string& token)
 	return false;
 
 }
-bool analyzer_t::isLegalVarName(const string& token, int line)
+bool analyzer_t::isLegalVarName(const string& token, int lineNum)
 {
 	if(!isalpha(token[0]) || isKeyword(token))
 	{
-		cout << fileName << ':' << line << " - error, illegal variable name" << endl;
+		cout << fileName << ':' << lineNum << " - error, illegal variable name" << endl;
 		return false;
 	}
 	for(int i = 1; i < token.length(); i++)
 	{
 		if(!isalnum(token[i]))
 		{
-			cout << fileName << ':' << line << " - error, illegal variable name" << endl;
+			cout << fileName << ':' << lineNum << " - error, illegal variable name" << endl;
 			return false;
 		}
 	}
 	if(isType(token))
 	{
-		cout << fileName << ':' << line << " - error, multiple type declaration" << endl;
+		cout << fileName << ':' << lineNum << " - error, multiple type declaration" << endl;
 		return false;
 	}
 	return true;
