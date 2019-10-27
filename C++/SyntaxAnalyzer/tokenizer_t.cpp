@@ -6,9 +6,11 @@
 #include <ctype.h>
 #include "tokenizer_t.h"
 
-int calculateSizeToRead(const string& line, const int& i)
+string tokenizer_t::delimiters = " \t\n\v\f\r()[]{};<>=+-*&";
+
+int calculateSizeToRead(const string& line, const int& i, const string& del)
 {
-	int firstOf = line.find_first_of(" \t\n\v\f\r()[]{};<>=+-*&", i);
+	int firstOf = line.find_first_of(del, i);
 	if(firstOf < 0)
 	{
 		return line.length() - i;
@@ -26,7 +28,7 @@ void tokenizer_t::tokenize(const string& line, const int& lineNum, deque<pair<in
 	char space[1];
 	while(i < line.length())
 	{
-		int sizeToRead = calculateSizeToRead(line, i);
+		int sizeToRead = calculateSizeToRead(line, i, delimiters);
 		while(sizeToRead == 0)
 		{
 			if(!isspace(line[i]))
@@ -35,7 +37,7 @@ void tokenizer_t::tokenize(const string& line, const int& lineNum, deque<pair<in
 			{
 				sstream.read(space, 1);
 				i++;
-				sizeToRead = calculateSizeToRead(line, i);
+				sizeToRead = calculateSizeToRead(line, i, delimiters);
 			}
 			if(i >= line.length())
 			{

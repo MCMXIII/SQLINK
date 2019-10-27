@@ -1,22 +1,23 @@
+#ifndef PARSER_T_H
+#define PARSER_T_H
+
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <deque>
 #include <utility>
-#include "tokenizer_t.h"
-#include "analyzer_t.h"
-#ifndef PARSER_T_H
-#define PARSER_T_H
+
+class analyzer_t;
+class tokenizer_t;
 
 using namespace std;
 
 class parser_t{
 	public:
-		parser_t() { lineNumber = 1; tokenizer = new tokenizer_t(); analyzer = new analyzer_t(); }
+		parser_t();
 		void openFile(const string& name) { if(!stream.is_open()) { stream.open(name.c_str(), std::fstream::in); if(stream.good()) fileName = name; else fileName = string("*"); }}
 		void closeFile() { if(stream.is_open()) stream.close(); }
 		void parse(const string& name);
-		~parser_t() { closeFile(); delete tokenizer; delete analyzer; }
+		~parser_t();
 	private:
 		unsigned int lineNumber;
 		string fileName;

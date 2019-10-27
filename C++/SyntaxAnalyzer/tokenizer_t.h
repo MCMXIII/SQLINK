@@ -1,9 +1,10 @@
+#ifndef TOKENIZER_T_H
+#define TOKENIZER_T_H
+
 #include <fstream>
 #include <string>
 #include <deque>
 #include <sstream>
-#ifndef TOKENIZER_T_H
-#define TOKENIZER_T_H
 
 using namespace std;
 
@@ -15,6 +16,7 @@ class tokenizer_t{
 	private:
 		tokenizer_t(const tokenizer_t& other) {}
 		tokenizer_t& operator=(const tokenizer_t& other);
+		static string delimiters;
 };
 
 #endif
