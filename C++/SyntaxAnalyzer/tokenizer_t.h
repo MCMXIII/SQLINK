@@ -6,7 +6,9 @@
 #include <deque>
 #include <sstream>
 
-using namespace std;
+using std::string;
+using std::deque;
+using std::stringstream;
 
 class tokenizer_t{
 	public:

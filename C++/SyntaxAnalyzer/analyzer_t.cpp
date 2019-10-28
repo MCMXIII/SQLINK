@@ -199,7 +199,7 @@ void analyzer_t::checkTokenValue(bool& isAfterType, const string& token)
 		}
 	}
 }
-void analyzer_t::checkBracketsFinally()
+void analyzer_t::checkBracketsFinally() const
 {
 	if(parentheses > 0) cout << fileName << " - error, " << parentheses << " '(' not closed" << endl;
 	if(brackets > 0) cout << fileName << " - error, " << brackets << " '[' not closed" << endl;
@@ -209,7 +209,7 @@ void analyzer_t::cleanAll()
 {
 	line = 1; parentheses = 0; braces = 0; brackets = 0; plusCounter = 0; minusCounter = 0; ifCounter = 0; (*declared).clear();
 }
-bool analyzer_t::isType(const string& token)
+bool analyzer_t::isType(const string& token) const
 {
 	for(int i = 0; i < 7; i++)
 	{
@@ -218,7 +218,7 @@ bool analyzer_t::isType(const string& token)
 	}
 	return false;
 }
-bool analyzer_t::isKeyword(const string& token)
+bool analyzer_t::isKeyword(const string& token) const
 {
 	for(int i = 0; i < 11; i++)
 	{
@@ -228,7 +228,7 @@ bool analyzer_t::isKeyword(const string& token)
 	return false;
 
 }
-bool analyzer_t::isLegalVarName(const string& token, const int& lineNum)
+bool analyzer_t::isLegalVarName(const string& token, const int& lineNum) const
 {
 	if((!isalpha(token[0]) && token[0] != '_') || isKeyword(token))
 	{
@@ -250,7 +250,7 @@ bool analyzer_t::isLegalVarName(const string& token, const int& lineNum)
 	}
 	return true;
 }
-bool analyzer_t::isDeclared(const string& token)
+bool analyzer_t::isDeclared(const string& token) const
 {
 	vector<string>::iterator it = (*declared).begin();
 	while(it != (*declared).end())

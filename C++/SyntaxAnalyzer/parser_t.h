@@ -1,6 +1,7 @@
 #ifndef PARSER_T_H
 #define PARSER_T_H
 
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <deque>
@@ -8,7 +9,11 @@
 class analyzer_t;
 class tokenizer_t;
 
-using namespace std;
+using std::fstream;
+using std::string;
+using std::deque;
+using std::endl;
+using std::cout;
 
 class parser_t{
 	public:
