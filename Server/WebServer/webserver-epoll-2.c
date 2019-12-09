@@ -29,7 +29,7 @@ const char* homePage = "<html>\n" \
 "</html>\n";
 int read_descriptors[1000];
 // Function designed for chat between client and server. 
-void func(int connfd, char action) 
+void func(int connfd, char action, int epollfd) 
 { 
     char responseHeader[512]=\
     "HTTP/1.1 200 OK\n" \
@@ -49,57 +49,60 @@ void func(int connfd, char action)
     switch(action)
     {
 	case 'r':
-	ret = read(connfd, buff, sizeof(buff)); 
-	buff[ret] = 0;
-	path[0] = '.';
-	for(i = 1; i < 512; i++)
-		path[i] = '\0';
-	strncpy(&path[1], &buff[4], strchr(&buff[4], ' ') - &buff[4]);
-	printf("From client:\n%s\n", buff); 
-	response[9] = '2';
-	response[11] = '0';
-    	fd = open(path,O_RDONLY);
-    	if(fd == -1)
-    	{
-		printf("Failed to open file!\n");
-		response[9] = '4';
-    		response[11] = '4';
-		strcpy(&responseHeader[strlen(responseHeader)], notFound);
-		ret = write(connfd, responseHeader, strlen(responseHeader));
-		close(connfd);
-	}
-	else
-    	{
-		sleep(3);
-		if(strlen(path) == 2 && path[1] == '/')
-		{
-			strcpy(&responseHeader[strlen(responseHeader)], homePage);
+		ret = read(connfd, buff, sizeof(buff)); 
+		buff[ret] = 0;
+		path[0] = '.';
+		for(i = 1; i < 512; i++)
+			path[i] = '\0';
+		strncpy(&path[1], &buff[4], strchr(&buff[4], ' ') - &buff[4]);
+		printf("From client:\n%s\n", buff); 
+		responseHeader[9] = '2';
+		responseHeader[11] = '0';
+	    	fd = open(path,O_RDONLY);
+	    	if(fd == -1)
+	    	{
+			printf("Failed to open file!\n");
+			responseHeader[9] = '4';
+	    		responseHeader[11] = '4';
+			strcpy(&responseHeader[strlen(responseHeader)], notFound);
 			ret = write(connfd, responseHeader, strlen(responseHeader));
 			close(connfd);
 		}
 		else
-		{
-        		read_descriptors[connfd] = fd;
+	    	{
+			sleep(3);
+			if(strlen(path) == 2 && path[1] == '/')
+			{
+				strcpy(&responseHeader[strlen(responseHeader)], homePage);
+				ret = write(connfd, responseHeader, strlen(responseHeader));
+				close(connfd);
+			}
+			else
+			{
+				ret = write(connfd, responseHeader, strlen(responseHeader));
+				read_descriptors[connfd] = fd;
+			}
+		
 		}
-	
-	}
-	break;
+		break;
 	case 'w':
 		ret = read(read_descriptors[connfd], buff, sizeof(buff));
 		writeL = ret;
 		if(writeL > 0)
 		{
+			
 			ret = write(connfd, buff, writeL);
 		}
 		else
 		{
 			struct epoll_event event;
 			event.data.fd = connfd;
-			err(epoll_ctl(epollfd, EPOLL_CTL_DEL, connfd, &event));
+			epoll_ctl(epollfd, EPOLL_CTL_DEL, connfd, &event);
 			close(read_descriptors[connfd]);			
 			close(connfd);
 		}
-	    
+	    	break;
+	}
         /*// if msg contains "Exit" then server exit and chat ended. 
         if (strncmp("exit", buff, 4) == 0) { 
             printf("Server Exit...\n"); 
@@ -110,7 +113,7 @@ void func(int connfd, char action)
 // Driver function 
 int main() 
 { 
-    int i, connfd, sockfd, epollfd, len, nfds;
+    int i, connfd, sockfd, epollfd, len, nfds, evs, evfd;
     struct sockaddr_in servaddr, cli; 
     struct epoll_event ev, events[MAX_EVENTS];
     // socket create and verification 
@@ -162,7 +165,7 @@ int main()
 		printf("server acccept failed...\n"); 
 		exit(0); 
 	}*/
-	err(epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &event));
+	epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &ev);
 	// Function for chatting between client and server
 	sleep(3);
 	nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
@@ -173,7 +176,9 @@ int main()
 	}
 	for (i = 0; i < nfds; ++i) {
 		printf("%d-%d\n",i,events[i].data.fd); 
-		if (events[i].data.fd == sockfd) {
+		evfd = events[i].data.fd;
+		evs=events[i].events;
+		if (evfd == sockfd) {
 			printf("1...\n"); 
 			connfd = accept(sockfd, (SA*)&cli, &len);
 			if (connfd < 0) { 
@@ -191,9 +196,20 @@ int main()
 		        /*func(connfd); */
 		} else {
 			/*do_use_fd(events[i].data.fd);*/
+			if(evs & EPOLLIN) {
+				func(evfd, 'r', 0);
+				struct epoll_event event;
+				event.data.fd = evfd;
+				event.events = EPOLLOUT;
+				epoll_ctl(epollfd, EPOLL_CTL_MOD, evfd, &event);
+			}
+			if(evs & EPOLLOUT) {
+				func(evfd, 'w', epollfd);
+			}
 		}
 	}
     }
     // After chatting close the socket 
     close(sockfd); 
-} 
+    close(epollfd);
+}
